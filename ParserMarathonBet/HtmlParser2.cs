@@ -36,9 +36,8 @@ namespace ParserMarathonBet
                 var eventNodes = groupNode.SelectSingleNode(".//following-sibling::div[contains(@class, 'category-content')]")
                     .SelectNodes(".//div[contains(@class, 'bg coupon-row')]");
 
-                // Находим блоки событий
-                var keys = groupNode.SelectSingleNode(".//following-sibling::table[contains(@class, 'coupon-row-item')]")
-                    ;
+                
+                string[] keys = { "Название события", "", "1", "X", "2", "1X", "12", "X2", "Фора1", "Фора2", "Меньше", "Больше" }  ;
 
                 foreach (var eventNode in eventNodes)
                 {
@@ -58,9 +57,13 @@ namespace ParserMarathonBet
                     // Извлекаем данные столбцов
                     var columns = eventNode.SelectNodes(".//td[contains(@class, 'price')]");
                     int count = 0;
+                    int countKey =0;
                     foreach (var column in columns)
                     {
-                        var key = column.SelectSingleNode(".//span").InnerText.Trim();
+                        //var key = column.SelectSingleNode(".//span").InnerText.Trim();
+                        var key = "";
+                        if(countKey<keys.Length)key = keys[countKey];
+                        countKey++;
                         var value = "-";
                         if (column.SelectSingleNode(".//span[contains(@class, 'selection-linkactive-selection')]") != null)
                             value = column.SelectSingleNode(".//span[contains(@class, 'selection-linkactive-selection')]").InnerText.Trim();

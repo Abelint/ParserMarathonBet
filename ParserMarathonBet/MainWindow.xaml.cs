@@ -64,13 +64,13 @@ namespace ParserMarathonBet
                 var nodes = htmlDoc.DocumentNode.SelectNodes("//div[contains(@class, 'category-container')]");
                 if (nodes != null)
                 {
-                    DataListBox.Items.Clear();
+                   
                     int count = 0;
                     foreach (var node in nodes)
                     {
                        // var someData = node.InnerText.Trim().Replace("\n", "");
                         var someData = node.InnerHtml.Trim().Replace("\n", "");
-                        DataListBox.Items.Add(someData);
+                       
                         count++;
                        
                         if (count > 1) Show(someData);

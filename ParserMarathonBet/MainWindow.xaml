@@ -9,7 +9,7 @@
         <StackPanel>
             <TextBox Name="UrlTextBox" Text="https://www.marathonbet.ru/su/live/26418" Margin="10"/>
             <Button Name="LoadButton" Content="Load Data" Click="LoadButton_Click" Margin="10"/>
-            <ListBox Name="DataListBox" Margin="10"/>
+          
             <Grid>
                 <ListBox Name="GroupsListBox" SelectionChanged="GroupsListBox_SelectionChanged" DisplayMemberPath="GroupName"/>
                 <DataGrid Name="EventsDataGrid" AutoGenerateColumns="True" Margin="0,200,0,0"/>
