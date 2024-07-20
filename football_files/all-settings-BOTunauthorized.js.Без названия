@@ -1,0 +1,229 @@
+webimApplyServerSideSettings({
+    "accountBlocked": null,
+    "locationSettings": {
+        "button": {
+            "kind": "html",
+            "slider": {
+                "position": "left",
+                "top": 150,
+                "width": 261,
+                "alwaysVisibleWidth": 30
+            },
+            "corner": {
+                "position": "right-bottom"
+            },
+            "html": {
+                "style": {
+                    "background-color": "rgba(255,217,0,1)",
+                    "border-color": "rgba(255,217,0,1)",
+                    "image-color": "rgba(0,0,0,1)"
+                },
+                "draggable": "N",
+                "position": {
+                    "top": "initial",
+                    "left": "initial",
+                    "bottom": "calc(2% - (155px * 0.02))",
+                    "right": "calc(2% - (300px * 0.02))"
+                }
+            },
+            "name": "html",
+            "offlineEnabled": "N",
+            "channels": [
+                {
+                    "id": "a32ec32b75dd4a98b3701395e7c34c32"
+                }
+            ],
+            "channel": {
+                "default": {
+                    "style": {}
+                },
+                "webim": {
+                    "name": "",
+                    "style": {
+                        "background-color": "rgba(255,217,0,1)",
+                        "border-color": "rgba(255,217,0,1)",
+                        "image-color": "rgba(0,0,0,1)"
+                    }
+                }
+            }
+        },
+        "invitation": {
+            "dontShow": false,
+            "theme": "static",
+            "position": "bottom-right",
+            "timeout": 90000,
+            "avatar": null,
+            "bg": null,
+            "fontColor": null
+        },
+        "chat": {
+            "lang": "ru",
+            "departmentKey": "bot_dlia_neavtorizovannoi_zony",
+            "chatEnterFirstMessage": "N",
+            "defaultLayout": {
+                "size": {
+                    "width": 380,
+                    "height": "560"
+                },
+                "position": {
+                    "right": 10,
+                    "bottom": 10
+                }
+            },
+            "hintsEnabled": "N",
+            "visitorFields": {
+                "def": {
+                    "name": {
+                        "presence": "mandatory",
+                        "validation": {
+                            "maxLength": 64
+                        }
+                    },
+                    "email": {
+                        "presence": "none",
+                        "validation": {
+                            "type": "email"
+                        }
+                    },
+                    "phone": {
+                        "presence": "none",
+                        "validation": {
+                            "mask": "+7 (XXX) XXX-XX-XX"
+                        }
+                    },
+                    "icq": {
+                        "presence": "none"
+                    },
+                    "login": {
+                        "presence": "mandatory"
+                    },
+                    "company": {
+                        "presence": "none"
+                    },
+                    "passport_number": {
+                        "presence": "none"
+                    },
+                    "codeword": {
+                        "presence": "none"
+                    }
+                },
+                "firstQuestion": [],
+                "offlineMode": {
+                    "email": {
+                        "presence": "mandatory",
+                        "validation": {
+                            "type": "email"
+                        }
+                    }
+                },
+                "contactsRequest": []
+            },
+            "visitorFieldLabels": {
+                "name": null,
+                "phone": null,
+                "email": null,
+                "icq": null,
+                "login": null,
+                "company": null,
+                "passport_number": null,
+                "codeword": null
+            },
+            "logo": null,
+            "proposeToRateBeforeClose": "Y",
+            "showSelectModeMenu": "N",
+            "hideMenu": "N",
+            "messageDateFormat": "DD.MM",
+            "availableDepartmentKeys": [],
+            "headerColor": null,
+            "headerGradientColor": null,
+            "bgColor": null,
+            "buttonColor": null,
+            "buttonGradientColor": null,
+            "chooseDepartment": null,
+            "departmentsSort": null
+        },
+        "styles": {
+            "header": {
+                "background": "rgba(5,110,120,1)",
+                "gradient": ""
+            },
+            "body": {
+                "background": null
+            },
+            "button": {
+                "background": "rgba(7,151,77,1)",
+                "gradient": null
+            },
+            "invitation-body": {
+                "background": null,
+                "color": null,
+                "font-size": null
+            },
+            "invitation-header": {
+                "background": null
+            },
+            "messageAgent": {
+                "background": "rgb(237,237,237)"
+            },
+            "messageVisitor": {
+                "background": "rgb(227,242,253)"
+            }
+        },
+        "misc": {
+            "fixFlashWmode": false
+        },
+        "resources": {
+            "leavemessage-descr": null,
+            "first_question-descr": null,
+            "chat-operator-default_title": "Служба поддержки",
+            "chat-window-personal_data_agreement": null
+        }
+    },
+    "accountConfig": {
+        "multilang": false,
+        "chatting_timer": false,
+        "google_analytics": true,
+        "yandex_metrika_counter_id": null,
+        "teleport": false,
+        "client_php_url": null,
+        "hide_referrer": true,
+        "force_visitor_https": false,
+        "visitor_tracking": false,
+        "force_visitor_disable": false,
+        "visitor_enabling_probability": 100,
+        "default_lang": "ru",
+        "rate_operator": true,
+        "allowed_upload_file_types": "png, jpg, jpeg, doc, docx, rtf, gif, txt, pdf, webp, oga, ogg, ogv, mp3, wav, mp4, m4a, mov, aac, odt, amr, jpe, heic, heif, avif, 3gp, xlsx, mkv, opus",
+        "show_processing_personal_data_checkbox": false,
+        "visitor_websockets": false,
+        "visitor_upload_file": false,
+        "operator_check_status_online": 300,
+        "visitor_hints_api_endpoint": null,
+        "file_url_expiring_timeout": 86400,
+        "check_visitor_auth": false,
+        "operator_status_timer": false,
+        "visitor_message_editing": false,
+        "web_and_mobile_quoting": true,
+        "offline_chat_processing": true,
+        "open_chat_in_new_tab_for_mobile": false,
+        "max_visitor_upload_file_size": 10
+    },
+    "ainviteRules": [],
+    "tariffOptions": {
+        "hide_poweredby_link": true,
+        "chat_colors": true,
+        "push_url": true,
+        "operator_file_upload": true,
+        "invitation": true,
+        "offline_message": true
+    },
+    "channels": [
+        {
+            "id": "a32ec32b75dd4a98b3701395e7c34c32",
+            "type": "telegram",
+            "name": "Telegram",
+            "app_link_format": false,
+            "page_id": "mbet_ru_support_bot"
+        }
+    ]
+});
