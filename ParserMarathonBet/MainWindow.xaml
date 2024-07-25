@@ -4,16 +4,23 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
-        Title="Marathonbet Parser" Height="450" Width="800">
+        Title="Marathonbet Parser" Height="450" Width="1600">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <StackPanel Orientation="Horizontal" Grid.Row="0">
-            <TextBox Name="UrlTextBox" Text="https://www.marathonbet.ru/su/live/26418" Margin="10"/>
-            <Button Name="LoadButton" Content="Load Data" Click="LoadButton_Click" Margin="10"/>
-        </StackPanel>
+
+        <!-- Измененный StackPanel для размещения элементов во всю ширину окна -->
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <TextBox Name="UrlTextBox" Text="https://www.marathonbet.ru/su/live/26418;https://www.marathonbet.ru/su/live/22723" Margin="10" Grid.Column="0"/>
+            <Button x:Name="LoadButton" Content="Запуск" Click="LoadButton_Click" Margin="10" HorizontalAlignment="Right" Grid.Column="1"/>
+        </Grid>
 
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>

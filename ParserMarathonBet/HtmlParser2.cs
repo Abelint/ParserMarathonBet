@@ -25,7 +25,7 @@ namespace ParserMarathonBet
                 var groupData = new GroupData
                 {
                     GroupName = groupName,
-                    Events = new List<EventData>()
+                    Events = new System.Collections.ObjectModel.ObservableCollection<EventData>()
                 };
 
                 //var keys = groupNode.SelectNodes(".//table[contains(@class, 'coupon-row-item coupone-labels')]");
@@ -36,7 +36,7 @@ namespace ParserMarathonBet
                 var eventNodes = groupNode.SelectSingleNode(".//following-sibling::div[contains(@class, 'category-content')]")
                     .SelectNodes(".//div[contains(@class, 'bg coupon-row')]");
 
-                
+                var temp = ParseHtmlTable(groupNode);
                 string[] keys = { "Название события", "", "1", "X", "2", "1X", "12", "X2", "Фора1", "Фора2", "Меньше", "Больше" }  ;
 
                 foreach (var eventNode in eventNodes)
@@ -78,6 +78,40 @@ namespace ParserMarathonBet
             }
 
             return groups;
+        }
+
+        List<string> ParseHtmlTable(HtmlNode html)
+        {
+
+            List<string> columnNames = new List<string>();
+            // Ищем таблицу по классу
+            var table = html.SelectSingleNode("//table[@class='coupon-row-item coupone-labels']");
+
+            if (table != null)
+            {
+                // Ищем строки таблицы
+                var rows = table.SelectNodes(".//tr");
+
+                foreach (var row in rows)
+                {
+                    // Ищем ячейки в строке
+                    var cells = row.SelectNodes(".//th | .//td");
+
+                    if (cells != null)
+                    {
+                        var cellValues = cells.Select(cell => cell.InnerText.Trim()).ToList();
+                        columnNames.AddRange(cellValues);
+                        var result = string.Join("; ", cellValues);
+                        Console.WriteLine(result);
+
+                    }
+                }
+            }
+            else
+            {
+                Console.WriteLine("Таблица не найдена.");
+            }
+            return columnNames;
         }
     }
 }
