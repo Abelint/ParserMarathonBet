@@ -19,13 +19,11 @@ namespace ParserMarathonBet
 {
     public partial class MainWindow : Window
     {
-     
-
         private ObservableCollection<SubjectData> subjects = new ObservableCollection<SubjectData>();
         List<EventData> events = new List<EventData>();
         bool start = false;
         bool startStatus = false;
-        bool startParse = false; 
+        bool startParse = false;
         bool statusParse = false;
         private DispatcherTimer timer;
         private DispatcherTimer timerParser;
@@ -33,58 +31,114 @@ namespace ParserMarathonBet
         public MainWindow()
         {
             InitializeComponent();
-            // GroupsListBox.ItemsSource = groups;
             SubjectsListBox.ItemsSource = subjects;
 
-            // Initialize and start the timer
             timer = new DispatcherTimer();
-            timer.Interval = TimeSpan.FromSeconds(1); // Set interval to 30 seconds
+            timer.Interval = TimeSpan.FromSeconds(1); // Set interval to 1 second
             timer.Tick += Timer_Tick;
             timer.Start();
-
         }
+
         private void Timer_Tick(object sender, EventArgs e)
         {
             if (start)
             {
-                if(startStatus) return; 
+                if (startStatus) return;
                 startStatus = true;
+
                 if (GroupsListBox.SelectedItems.Count > 0)
                 {
                     var selectedGroups = GroupsListBox.SelectedItems.Cast<GroupData>().ToList();
                     events = selectedGroups.SelectMany(g => g.Events).Distinct().ToList();
                     EventsDataGrid.ItemsSource = events;
-                    //UpdateEventColumns(events);
-                    start = true;
 
+                    EventsDataGrid.Columns.Clear();
+                    EventsDataGrid.Columns.Add(new DataGridTextColumn { Header = "EventName", Binding = new Binding("EventName") });
+                    EventsDataGrid.Columns.Add(new DataGridTextColumn { Header = "Team1", Binding = new Binding("Team1") });
+                    EventsDataGrid.Columns.Add(new DataGridTextColumn { Header = "Team2", Binding = new Binding("Team2") });
+                    EventsDataGrid.Columns.Add(new DataGridTextColumn { Header = "Счет", Binding = new Binding("Schet") });
+                    EventsDataGrid.Columns.Add(new DataGridTextColumn { Header = "Время", Binding = new Binding("Time") });
+
+                    if (events.Any())
+                    {
+                        var allKeys = events.SelectMany(events => events.EventColumns.Keys).Distinct().ToList();
+                        foreach (var key in allKeys)
+                        {
+                            EventsDataGrid.Columns.Add(new DataGridTextColumn
+                            {
+                                Header = key,
+                                Binding = new Binding($"EventColumns[{key}]")
+                            });
+                        }
+                    }
+                    HighlightRows();
+                    start = false;
                 }
                 else
                 {
                     EventsDataGrid.ItemsSource = null;
                 }
 
+                startStatus = false;
+            }
+        }
 
-                EventsDataGrid.Columns.Clear();
-
-                EventsDataGrid.Columns.Add(new DataGridTextColumn { Header = "EventName", Binding = new Binding("EventName") });
-                EventsDataGrid.Columns.Add(new DataGridTextColumn { Header = "Team1", Binding = new Binding("Team1") });
-                EventsDataGrid.Columns.Add(new DataGridTextColumn { Header = "Team2", Binding = new Binding("Team2") });
-                EventsDataGrid.Columns.Add(new DataGridTextColumn { Header = "Счет", Binding = new Binding("Schet") });
-                EventsDataGrid.Columns.Add(new DataGridTextColumn { Header = "Время", Binding = new Binding("Time") });
-
-                if (events.Any())
+        private void HighlightRows()
+        {
+            foreach (var eventData in events)
+            {
+                var row = (DataGridRow)EventsDataGrid.ItemContainerGenerator.ContainerFromItem(eventData);
+                if (row != null)
                 {
-                    var allKeys = events.SelectMany(events => events.EventColumns.Keys).Distinct().ToList();
-                    foreach (var key in allKeys)
+
+                    if (Convert.ToInt32(eventData.Time.Split(':')[0]) > 70 && eventData.Schet.Split(':')[0] == eventData.Schet.Split(':')[1])
                     {
-                        EventsDataGrid.Columns.Add(new DataGridTextColumn
+                        if (eventData.EventColumns.ContainsKey("X") && double.TryParse(eventData.EventColumns["X"], out double xValue) && xValue > 1.99)
                         {
-                            Header = key,
-                            Binding = new Binding($"EventColumns[{key}]")
-                        });
+                            row.Background = System.Windows.Media.Brushes.LightPink;
+                        }
+
+                        if (eventData.EventColumns.ContainsKey("Фора1") && double.TryParse(eventData.EventColumns["Фора1"], out double fora1Value) && fora1Value < 1.28 ||
+                            eventData.EventColumns.ContainsKey("Фора2") && double.TryParse(eventData.EventColumns["Фора2"], out double fora2Value) && fora2Value < 1.28)
+                        {
+                            row.Background = System.Windows.Media.Brushes.LightPink;
+                        }
+                        double more = 0;
+                        double.TryParse(eventData.EventColumns["Больше"], out more);
+                        if (eventData.EventColumns.ContainsKey("Фора1") && double.TryParse(eventData.EventColumns["Фора1"], out double fora1) &&
+                            eventData.EventColumns.ContainsKey("Больше") && double.TryParse(eventData.EventColumns["Больше"], out double more2) &&
+                            fora1 != more2 ||
+                            eventData.EventColumns.ContainsKey("Фора2") && double.TryParse(eventData.EventColumns["Фора2"], out double fora2) && fora2 != more)
+                        {
+                            row.Background = System.Windows.Media.Brushes.LightPink;
+                        }
+                    }
+                    //// тут не 2, нужно разобраться
+                    //if (Convert.ToInt32(eventData.Time.Split(':')[0]) > 70 && eventData.Schet.Split(':')[0] > 2)
+                    //{
+                    //    if (eventData.EventColumns.ContainsKey("Фора1") && double.TryParse(eventData.EventColumns["Фора1"], out double fora1Value) && fora1Value < eventData.Schet ||
+                    //        eventData.EventColumns.ContainsKey("Фора2") && double.TryParse(eventData.EventColumns["Фора2"], out double fora2Value) && fora2Value < eventData.Schet)
+                    //    {
+                    //        row.Background = System.Windows.Media.Brushes.LightPink;
+                    //    }
+                    //}
+
+                    if (Convert.ToInt32(eventData.Time.Split(':')[0]) > 80)
+                    {
+                        if (eventData.EventColumns.ContainsKey("Больше") && double.TryParse(eventData.EventColumns["Больше"], out double moreValue) && moreValue <= 2)
+                        {
+                            row.Background = System.Windows.Media.Brushes.LightPink;
+                        }
+                    }
+
+                    if (Convert.ToInt32(eventData.Time.Split(':')[0]) > 85)
+                    {
+                        if (eventData.EventColumns.ContainsKey("Больше") && double.TryParse(eventData.EventColumns["Больше"], out double moreValue) && moreValue <= 3)
+                        {
+                            row.Background = System.Windows.Media.Brushes.LightPink;
+                        }
                     }
                 }
-                startStatus = false;
             }
         }
 
@@ -95,7 +149,7 @@ namespace ParserMarathonBet
             {
                 LoadButton.Content = "Остановить";
                 timerParser = new DispatcherTimer();
-                timerParser.Interval = TimeSpan.FromSeconds(3); // Set interval to 30 seconds
+                timerParser.Interval = TimeSpan.FromSeconds(3); // Set interval to 3 seconds
                 timerParser.Tick += TimerParser_Tick;
                 timerParser.Start();
             }
@@ -103,15 +157,12 @@ namespace ParserMarathonBet
             {
                 LoadButton.Content = "Запуск";
                 timerParser.Stop();
-                
             }
-            
-
-
         }
+
         private async void TimerParser_Tick(object sender, EventArgs e)
         {
-            if (statusParse) return; 
+            if (statusParse) return;
             statusParse = true;
             string[] url = UrlTextBox.Text.Split(';');
             foreach (var u in url)
@@ -121,7 +172,7 @@ namespace ParserMarathonBet
             statusParse = false;
         }
 
-            private async Task ParsePageAsync(string url)
+        private async Task ParsePageAsync(string url)
         {
             var httpClient = new HttpClient();
 
@@ -141,7 +192,7 @@ namespace ParserMarathonBet
                         var id = node.GetAttributeValue("id", string.Empty);
                         if (!string.IsNullOrEmpty(id))
                         {
-                            ecids.Add(id.Split('_')[1]);  // Assuming the ID format is always 'container_<number>'
+                            ecids.Add(id.Split('_')[1]);
                         }
                     }
                 }
@@ -177,18 +228,13 @@ namespace ParserMarathonBet
                                         subject = new SubjectData { SubjectName = categoryName, Groups = new ObservableCollection<GroupData>() };
                                         subjects.Add(subject);
                                     }
-                                    //else
-                                    //{
-                                    //    CheckSubject(subject);
-                                        
-                                    //}
+
                                     var nodes = div.SelectNodes(".//div[contains(@class, 'category-container')]");
                                     if (nodes != null)
                                     {
                                         foreach (var node in nodes)
                                         {
                                             var someData = node.InnerHtml.Trim().Replace("\n", "");
-
                                             var parser = new HtmlParser();
                                             var newGroups = parser.ParseHtml(div.InnerHtml);
 
@@ -203,9 +249,6 @@ namespace ParserMarathonBet
                                                 else
                                                 {
                                                     existingGroup.Events = newGroup.Events;
-                                                   // UpdateEventColumns(existingGroup.Events.ToList());
-                                                   // subject.Groups.Add(existingGroup);
-
                                                 }
                                             }
                                         }
@@ -230,37 +273,9 @@ namespace ParserMarathonBet
             }
             catch (Exception ex)
             {
-               // MessageBox.Show($"Произошла ошибка: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show($"Произошла ошибка: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
-
-
-        private void CheckSubject(SubjectData subject)
-        {
-            if (subject == null) { return; }
-            bool update = false;
-            for(int i = 0; i < subjects.Count; i++) {
-                if (subject.SubjectName == subjects[i].SubjectName)
-                {
-                   for(int j = 0; j < subjects[i].Groups.Count; j++)
-                    {
-                        for (int k = 0;subject.Groups.Count > k; k++)
-                        {
-                            if (subjects[i].Groups[j].GroupName == subject.Groups[k].GroupName)
-                            {
-                                update = true;
-                                subjects[i].Groups[j]= subject.Groups[k];
-                                
-                            }
-                        }
-                        
-                    }
-                }
-            }
-            if(!update) { subjects.Add(subject); }
-
-        }
-     
 
         private void SubjectsListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
@@ -284,20 +299,13 @@ namespace ParserMarathonBet
                 var selectedGroups = GroupsListBox.SelectedItems.Cast<GroupData>().ToList();
                 events = selectedGroups.SelectMany(g => g.Events).Distinct().ToList();
                 EventsDataGrid.ItemsSource = events;
-                
-                start = true;
-               
-               
 
+                start = true;
             }
             else
             {
                 EventsDataGrid.ItemsSource = null;
             }
         }
-
-     
-
-      
     }
 }

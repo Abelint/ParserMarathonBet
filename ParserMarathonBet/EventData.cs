@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace ParserMarathonBet
@@ -19,7 +20,10 @@ namespace ParserMarathonBet
         private string team1;
         private string team2;
         private string schet;
+        private int schet1 = -1;
+        private int schet2 = -1;
         private string time;
+        private DateTime dateTime;
         private Dictionary<string, string> eventColumns;
 
         public string EventName
@@ -95,6 +99,7 @@ namespace ParserMarathonBet
                 if (eventColumns != value)
                 {
                     eventColumns = value;
+                  //  GetInfo();
                     OnPropertyChanged(nameof(EventColumns));
                 }
             }
@@ -105,6 +110,18 @@ namespace ParserMarathonBet
         protected virtual void OnPropertyChanged(string propertyName)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        private void GetInfo()
+        {
+            string pattern = @"^(\d+:\d+)";
+            Match match = Regex.Match(schet, pattern);
+            schet1 = Convert.ToInt32(match.Groups[1].Value.Split(':')[0]);
+            schet2 = Convert.ToInt32(match.Groups[1].Value.Split(':')[1]);
+            match = Regex.Match(Time, pattern);
+            DateTime.TryParse(match.Groups[0].Value, out dateTime);
+           
+
         }
     }
 }
