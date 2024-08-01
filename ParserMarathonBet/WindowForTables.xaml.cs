@@ -262,89 +262,97 @@ namespace ParserMarathonBet
             while (hasNextPage)
             {
                 string url = baseUrl + currentPage + "&pageAction=getPage";
-
-                HttpResponseMessage response = await client.GetAsync(url);
-                string responseBody = await response.Content.ReadAsStringAsync();
-
-                // Обработка ответа страницы
-                HtmlDocument document = new HtmlDocument();
-                document.LoadHtml(responseBody);
-
-                // Извлечение данных с текущей страницы
-                var nodes = document.DocumentNode.SelectNodes(".//div[contains(@class, 'category-container')]");
-                if (nodes == null || nodes.Count == 0)
+                try
                 {
-                    hasNextPage = false;
-                    continue;
-                }
 
-                nodes.RemoveAt(0); // Удаление первого узла
 
-                foreach (var node in nodes)
-                {
-                    var nodeInfo = new NodeInfo();
+                    HttpResponseMessage response = await client.GetAsync(url);
+                    string responseBody = await response.Content.ReadAsStringAsync();
 
-                    // Ищем все таблицы с классом "category-header" внутри текущего узла
-                    var groupNodes = node.SelectNodes(".//table[contains(@class, 'category-header')]");
-                    if (groupNodes != null)
+                    // Обработка ответа страницы
+                    HtmlDocument document = new HtmlDocument();
+                    document.LoadHtml(responseBody);
+
+                    // Извлечение данных с текущей страницы
+                    var nodes = document.DocumentNode.SelectNodes(".//div[contains(@class, 'category-container')]");
+                    if (nodes == null || nodes.Count == 0)
                     {
-                        foreach (var groupNode in groupNodes)
-                        {
-                            var headerNode = groupNode.SelectSingleNode(".//h2[contains(@class, 'category-label')]");
-                            if (headerNode != null)
-                            {
-                                var eventText = headerNode.InnerText.Trim();
-                                nodeInfo.NodeName = eventText;
-                            }
-                        }
+                        hasNextPage = false;
+                        continue;
                     }
 
-                    // Ищем все таблицы с классом "coupon-row-item" внутри текущего узла
-                    var couponTables = node.SelectNodes(".//table[contains(@class, 'coupon-row-item')]");
-                    if (couponTables != null)
-                    {
-                        for (int k = 0; k < couponTables.Count; k++)
-                        {
-                            var couponTable = couponTables[k];
-                            var tableContent = couponTable.InnerText.Trim();
+                    nodes.RemoveAt(0); // Удаление первого узла
 
-                            string[] parts = tableContent.Split(new string[] { "  " }, StringSplitOptions.RemoveEmptyEntries);
-                            for (int i = 0; i < parts.Length; i++)
+                    foreach (var node in nodes)
+                    {
+                        var nodeInfo = new NodeInfo();
+
+                        // Ищем все таблицы с классом "category-header" внутри текущего узла
+                        var groupNodes = node.SelectNodes(".//table[contains(@class, 'category-header')]");
+                        if (groupNodes != null)
+                        {
+                            foreach (var groupNode in groupNodes)
                             {
-                                parts[i] = parts[i].Trim();
-                                if (parts[i] == "&mdash;")
+                                var headerNode = groupNode.SelectSingleNode(".//h2[contains(@class, 'category-label')]");
+                                if (headerNode != null)
                                 {
-                                    parts[i] = "-";
+                                    var eventText = headerNode.InnerText.Trim();
+                                    nodeInfo.NodeName = eventText;
                                 }
                             }
-                            EventInfo info = new EventInfo();
-                            if (k == 0) info = ParseEventInfo(parts, true);
-                            else info = ParseEventInfo(parts, false);
-                            nodeInfo.TableContents.Add(info);
+                        }
+
+                        // Ищем все таблицы с классом "coupon-row-item" внутри текущего узла
+                        var couponTables = node.SelectNodes(".//table[contains(@class, 'coupon-row-item')]");
+                        if (couponTables != null)
+                        {
+                            for (int k = 0; k < couponTables.Count; k++)
+                            {
+                                var couponTable = couponTables[k];
+                                var tableContent = couponTable.InnerText.Trim();
+
+                                string[] parts = tableContent.Split(new string[] { "  " }, StringSplitOptions.RemoveEmptyEntries);
+                                for (int i = 0; i < parts.Length; i++)
+                                {
+                                    parts[i] = parts[i].Trim();
+                                    if (parts[i] == "&mdash;")
+                                    {
+                                        parts[i] = "-";
+                                    }
+                                }
+                                EventInfo info = new EventInfo();
+                                if (k == 0) info = ParseEventInfo(parts, true);
+                                else info = ParseEventInfo(parts, false);
+                                nodeInfo.TableContents.Add(info);
+                            }
+                        }
+
+                        newResults.Add(nodeInfo);
+                    }
+
+                    // Проверка, есть ли следующая страница
+                    var hasNextPageNode = document.DocumentNode.SelectSingleNode("//script[contains(text(), 'hasNextPage')]");
+                    if (hasNextPageNode != null)
+                    {
+                        string scriptContent = hasNextPageNode.InnerText;
+                        int startIndex = scriptContent.IndexOf("{");
+                        int endIndex = scriptContent.LastIndexOf("}");
+                        if (startIndex != -1 && endIndex != -1)
+                        {
+                            string jsonResponse = scriptContent.Substring(startIndex, endIndex - startIndex + 1);
+                            JObject json = JObject.Parse(jsonResponse);
+                            hasNextPage = json["hasNextPage"]?.Value<bool>() ?? false;
                         }
                     }
 
-                    newResults.Add(nodeInfo);
-                }
-
-                // Проверка, есть ли следующая страница
-                var hasNextPageNode = document.DocumentNode.SelectSingleNode("//script[contains(text(), 'hasNextPage')]");
-                if (hasNextPageNode != null)
-                {
-                    string scriptContent = hasNextPageNode.InnerText;
-                    int startIndex = scriptContent.IndexOf("{");
-                    int endIndex = scriptContent.LastIndexOf("}");
-                    if (startIndex != -1 && endIndex != -1)
+                    if (hasNextPage)
                     {
-                        string jsonResponse = scriptContent.Substring(startIndex, endIndex - startIndex + 1);
-                        JObject json = JObject.Parse(jsonResponse);
-                        hasNextPage = json["hasNextPage"]?.Value<bool>() ?? false;
+                        currentPage++;
                     }
                 }
-
-                if (hasNextPage)
+                catch
                 {
-                    currentPage++;
+                    
                 }
             }
 
@@ -483,7 +491,63 @@ namespace ParserMarathonBet
         private void RD()
         {
             Display.Clear();
-            foreach (var r in Results)
+            var resultsTemp = new ObservableCollection<NodeInfo>(Results);
+            // Временные списки для сортировки по категориям
+            var newCollection = new List<NodeInfo>();
+            var wtaSingles = new List<NodeInfo>();
+            var atpSingles = new List<NodeInfo>();
+            var wtaDoubles = new List<NodeInfo>();
+            var atpDoubles = new List<NodeInfo>();
+            var others = new List<ForDisplay>();
+
+            string[] keys = { "WTA, одиночный разряд" , "ATP, одиночный разряд",
+            "WTA, парный разряд","ATP, парный разряд"};
+           
+                foreach (var item in resultsTemp)
+                {
+                    if (item.NodeName.Contains("WTA") && item.NodeName.Contains("Одиночный разряд"))
+                    {
+                        wtaSingles.Add(item);                       
+                    }
+                }
+            foreach (var item in wtaSingles) resultsTemp.Remove(item);
+
+
+            foreach (var item in resultsTemp)
+            {
+                if (item.NodeName.Contains("ATP") && item.NodeName.Contains("Одиночный разряд"))
+                {
+                    atpSingles.Add(item);                   
+                }
+            }
+            foreach (var item in atpSingles) resultsTemp.Remove(item);
+
+
+            foreach (var item in resultsTemp)
+            {
+                if (item.NodeName.Contains("WTA") && item.NodeName.Contains("Парный разряд"))
+                {
+                    wtaDoubles.Add(item);                    
+                }
+            }
+            foreach (var item in wtaDoubles) resultsTemp.Remove(item);
+
+            foreach (var item in resultsTemp)
+            {
+                if (item.NodeName.Contains("ATP") && item.NodeName.Contains("Парный разряд"))
+                {
+                    atpDoubles.Add(item);                    
+                }
+            }
+            foreach (var item in atpDoubles) resultsTemp.Remove(item);
+
+            newCollection.AddRange(wtaSingles);
+            newCollection.AddRange(atpSingles);
+            newCollection.AddRange(wtaDoubles);
+            newCollection.AddRange(atpDoubles);
+            newCollection.AddRange(resultsTemp);
+
+            foreach (var r in newCollection)
             {
                 ForDisplay forDisplay = new ForDisplay
                 {
@@ -576,20 +640,21 @@ namespace ParserMarathonBet
                             var sobitiye = ParseDateString(newEvent.Time1);
                             TimeSpan timeUntilEvent = sobitiye - nowTime;
                             TimeSpan lastParse = newEvent.DataParse - nowTime;
-                            if (timeUntilEvent.TotalHours > 24 && lastParse.TotalHours > 3 )
+                            int position = j + 1;
+                            if (timeUntilEvent.TotalHours > 24 && lastParse.TotalHours > 3)
                             {
-                                existingNode.TableContents.Insert(j, newEvent);
+                                existingNode.TableContents.Insert(position, newEvent);
                             }
                             else if (timeUntilEvent.TotalHours <= 24 && timeUntilEvent.TotalHours > 1 &&
                                 lastParse.TotalHours > 1)
                             {
-                                existingNode.TableContents.Insert(j, newEvent);
+                                existingNode.TableContents.Insert(position, newEvent);
                             }
                             else if (timeUntilEvent.TotalHours <= 1 && lastParse.TotalMinutes >= 5)
                             {
-                                existingNode.TableContents.Insert(j, newEvent);
+                                existingNode.TableContents.Insert(position, newEvent);
                             }
-                            
+                            //existingNode.TableContents.Insert(position, newEvent);
                         }
                     }
                 }

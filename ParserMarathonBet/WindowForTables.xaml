@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:ParserMarathonBet"
         xmlns:wv2="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
         mc:Ignorable="d"
-        Title="WindowForTables" Height="900" Width="1200">
+        Title="Теннис" Height="900" Width="1200">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
@@ -36,10 +36,6 @@
             </DataGrid.Columns>
         </DataGrid>
 
-        <Button Content="Button" Grid.Row="0" HorizontalAlignment="Right" Margin="10,30,10,0" VerticalAlignment="Top" 
-         Width="100" Height="30" Background="LightGray" Foreground="Black" FontWeight="Bold"
-         Panel.ZIndex="1" Click="Button_Click"/>
 
-       
     </Grid>
 </Window>
