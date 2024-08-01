@@ -73,11 +73,18 @@ namespace ParserMarathonBet
                         if (countKey < keys.Length) key = keys[countKey];
                         countKey++;
                         var value = "-";
-                        if (column.SelectSingleNode(".//span") != null)
+                        //var handicapValue = "";
+                        if (column != null)
                         {
-                            value = column.SelectSingleNode(".//span").InnerText.Trim();
-                            if (value == "&mdash;") value = "-";
+                            // Извлечение текста до <br>
+                            value = column.InnerText.Split(new[] { "<br>" }, StringSplitOptions.None)[0].Trim();
+                            
                         }
+                        //if (column.SelectSingleNode(".//span") != null)
+                        //{
+                        //    value = column.SelectSingleNode(".//span").InnerText.Trim();
+                        //    if (value == "&mdash;") value = "-";
+                        //}
                             
                         //if(column.SelectSingleNode(".//span[contains(@class, 'selection-linkactive-selection')]")!=null)
                         //    value = column.SelectSingleNode(".//span[contains(@class, 'selection-linkactive-selection')]").InnerText.Trim();

@@ -4,6 +4,8 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Globalization;
+using System.Linq;
 using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -230,13 +232,18 @@ namespace ParserMarathonBet
         {
             InitializeComponent();
             dataGrid.ItemsSource = Display;
+            FStartAsync();
             timer = new DispatcherTimer
             {
-                Interval = TimeSpan.FromMinutes(2)
+                Interval = TimeSpan.FromSeconds(20)
             };
             timer.Tick += async (s, e) => await StartParseAsync();
+            timer.Start();
         }
-
+        public async void FStartAsync()
+        {
+            await StartParseAsync();
+        }
         public async Task StartParseAsync()
         {
             await Parse();
@@ -420,6 +427,29 @@ namespace ParserMarathonBet
                     TotalGamesOver = "-"
                 };
             }
+            else if (input.Length == 14)
+            {
+                return new EventInfo
+                {
+                    EventName = input[0] + input[1] + "\n" + input[3] + input[4],
+                    Player1 = input[1],
+                    Player2 = input[4],
+                    Time1 = input[2],
+                    Time2 = input[5],
+                    Odds1 = input[1],
+                    Win1 = input[7],
+                    Odds2 = input[3],
+                    Win2 = input[8],
+                    Handicap1 = input[9],
+                    HandicapGames1 = input[10],
+                    Handicap2 = input[11],
+                    HandicapGames2 = input[12],
+                    Under = "-",                    
+                    TotalGamesUnder = "-",
+                    Over = "-",
+                    TotalGamesOver = "-"
+                };
+            }
             else if (input.Length == 12)
                 return new EventInfo
                 {
@@ -446,8 +476,8 @@ namespace ParserMarathonBet
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            StartParseAsync();
-            timer.Start();
+            //StartParseAsync();
+           
         }
 
         private void RD()
@@ -463,12 +493,19 @@ namespace ParserMarathonBet
                 Display.Add(forDisplay);
                 if (r != null)
                 {
+                    ForDisplay lastFD = null;
                     for (int i = 1; i < r.TableContents.Count; i++)
                     {
                         var t = r.TableContents[i];
+                       
                         if (t != null)
                         {
-                            color = !color;
+                            if (lastFD != null)
+                            {
+                               if(lastFD.EventName != t.Player1 + "\n" + t.Player2) color = !color;
+                            }
+                            //color = !color;
+
                             string tstr = "";
                             if (t.Time1 != null)
                             {
@@ -486,12 +523,13 @@ namespace ParserMarathonBet
                                 DataParse = t.DataParse.ToString(),
                                 One = t.Win1,
                                 Two = t.Win2,
-                                Fora1 = t.Handicap1 + "\n" + t.HandicapGames1,
-                                Fora2 = t.Handicap2 + "\n" + t.HandicapGames2,
-                                Down = t.Under + "\n" + t.TotalGamesUnder,
-                                Up = t.Over + "\n" + t.TotalGamesOver,
+                                Fora1 = t.Handicap1 + " " + t.HandicapGames1,
+                                Fora2 = t.Handicap2 + " " + t.HandicapGames2,
+                                Down = t.Under + " " + t.TotalGamesUnder,
+                                Up = t.Over + " " + t.TotalGamesOver,
                                 IsHighlighted = color
                             };
+                            lastFD = for2;
                             Display.Add(for2);
                         }
                     }
@@ -499,14 +537,21 @@ namespace ParserMarathonBet
                 }
             }
         }
+       
 
         private void UpdateResults(ObservableCollection<NodeInfo> newResults)
         {
             for (int i = 0; i < newResults.Count; i++)
             {
                 var newNode = newResults[i];
-                var existingNode = Results.Count > i ? Results[i] : null;
-
+                NodeInfo existingNode =  null;
+                foreach (var exN in Results)
+                {
+                    if(exN.NodeName == newNode.NodeName) {
+                        existingNode = exN;
+                        break;  
+                    }
+                }
                 if (existingNode == null)
                 {
                     Results.Add(newNode);
@@ -515,7 +560,7 @@ namespace ParserMarathonBet
                 {
                     existingNode.NodeName = newNode.NodeName;
 
-                    for (int j = 0; j < newNode.TableContents.Count; j++)
+                    for (int j = 1; j < newNode.TableContents.Count; j++)
                     {
                         var newEvent = newNode.TableContents[j];
                         var existingEvent = existingNode.TableContents.Count > j ? existingNode.TableContents[j] : null;
@@ -526,10 +571,54 @@ namespace ParserMarathonBet
                         }
                         else if (!newEvent.Equals(existingEvent))
                         {
-                            existingNode.TableContents[j] = newEvent;
+                            //existingNode.TableContents[j] = newEvent;
+                            DateTime nowTime = DateTime.Now;
+                            var sobitiye = ParseDateString(newEvent.Time1);
+                            TimeSpan timeUntilEvent = sobitiye - nowTime;
+                            TimeSpan lastParse = newEvent.DataParse - nowTime;
+                            if (timeUntilEvent.TotalHours > 24 && lastParse.TotalHours > 3 )
+                            {
+                                existingNode.TableContents.Insert(j, newEvent);
+                            }
+                            else if (timeUntilEvent.TotalHours <= 24 && timeUntilEvent.TotalHours > 1 &&
+                                lastParse.TotalHours > 1)
+                            {
+                                existingNode.TableContents.Insert(j, newEvent);
+                            }
+                            else if (timeUntilEvent.TotalHours <= 1 && lastParse.TotalMinutes >= 5)
+                            {
+                                existingNode.TableContents.Insert(j, newEvent);
+                            }
+                            
                         }
                     }
                 }
+            }
+        }
+        static DateTime ParseDateString(string dateString)
+        {
+            string formatDate = "dd MMM HH:mm";
+            string formatTime = "HH:mm";
+            CultureInfo provider = new CultureInfo("ru-RU");
+
+            DateTime result;
+
+            // Try parsing full date and time format
+            if (DateTime.TryParseExact(dateString, formatDate, provider, DateTimeStyles.None, out result))
+            {
+                return result;
+            }
+            // Try parsing only time format
+            else if (DateTime.TryParseExact(dateString, formatTime, provider, DateTimeStyles.None, out result))
+            {
+                // If the input string only contains time, add today's date
+                DateTime today = DateTime.Today;
+                result = new DateTime(today.Year, today.Month, today.Day, result.Hour, result.Minute, result.Second);
+                return result;
+            }
+            else
+            {
+                throw new FormatException("Invalid date format");
             }
         }
     }

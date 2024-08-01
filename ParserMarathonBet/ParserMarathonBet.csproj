@@ -77,8 +77,12 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="AdapterClass.cs" />
+    <Compile Include="FootbalShow.cs" />
     <Compile Include="SubjectData.cs" />
     <Compile Include="Tennis.cs" />
+    <Compile Include="WindowForFootbal.xaml.cs">
+      <DependentUpon>WindowForFootbal.xaml</DependentUpon>
+    </Compile>
     <Compile Include="WindowForTables.xaml.cs">
       <DependentUpon>WindowForTables.xaml</DependentUpon>
     </Compile>
@@ -98,6 +102,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="WindowForFootbal.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="WindowForTables.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

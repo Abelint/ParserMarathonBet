@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
 using System.Net.Http;
 using System.Text.RegularExpressions;
@@ -17,6 +18,7 @@ using HtmlAgilityPack;
 
 namespace ParserMarathonBet
 {
+    
     public partial class MainWindow : Window
     {
         private ObservableCollection<SubjectData> subjects = new ObservableCollection<SubjectData>();
@@ -31,6 +33,9 @@ namespace ParserMarathonBet
         public MainWindow()
         {
             InitializeComponent();
+            WindowForTables wft =new WindowForTables();
+            wft.Show();
+
             SubjectsListBox.ItemsSource = subjects;
 
             timer = new DispatcherTimer();
