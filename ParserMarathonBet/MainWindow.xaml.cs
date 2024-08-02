@@ -41,7 +41,7 @@ namespace ParserMarathonBet
             timer = new DispatcherTimer();
             timer.Interval = TimeSpan.FromSeconds(1); // Set interval to 1 second
             timer.Tick += Timer_Tick;
-            timer.Start();
+            //timer.Start();
         }
 
         private void Timer_Tick(object sender, EventArgs e)
@@ -278,7 +278,7 @@ namespace ParserMarathonBet
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Произошла ошибка: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+               // MessageBox.Show($"Произошла ошибка: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 

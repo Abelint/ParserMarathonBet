@@ -5,6 +5,8 @@ VisualStudioVersion = 17.8.34330.188
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ParserMarathonBet", "ParserMarathonBet\ParserMarathonBet.csproj", "{0533F4D3-AC06-4637-89E9-6D8B5FD76BCC}"
 EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "SetupMarathonBet", "SetupMarathonBet\SetupMarathonBet.vdproj", "{1B5CB32F-88BA-4FC5-B5DF-51E68501130C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,8 @@ Global
 		{0533F4D3-AC06-4637-89E9-6D8B5FD76BCC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0533F4D3-AC06-4637-89E9-6D8B5FD76BCC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0533F4D3-AC06-4637-89E9-6D8B5FD76BCC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1B5CB32F-88BA-4FC5-B5DF-51E68501130C}.Debug|Any CPU.ActiveCfg = Debug
+		{1B5CB32F-88BA-4FC5-B5DF-51E68501130C}.Release|Any CPU.ActiveCfg = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

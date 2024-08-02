@@ -1,4 +1,5 @@
 ﻿using HtmlAgilityPack;
+using OpenQA.Selenium;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -6,6 +7,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -32,7 +34,55 @@ namespace ParserMarathonBet
         public WindowForFootbal()
         {
             InitializeComponent();
+
+            AdapterClass.dBadapter.Init();
+           
+
+            Dictionary<string, string[]> tables = new Dictionary<string, string[]>();
+            tables["football"] = AdapterClass.footbalColumn;
+            tables["tennis"] = AdapterClass.tennisColumn;
+            AdapterClass.dBadapter.CreateTables(tables);
+
+            var data = AdapterClass.dBadapter.GetData("football");
+            foreach(var item in data)
+            {
+                DateTime time = DateTime.Now;
+                DateTime.TryParse((string)item["dateParse"], out time);
+                FootbalShow footbalShow = new FootbalShow()
+                {
+                     EventName = (string)item["eventName"],
+                     dateParse =time,
+                     Team1 = (string)item["team1"],
+                     Team2 = (string)item["team2"],
+                    Schet1 = int.Parse((string)item["schet1"]),
+                    Schet2 = int.Parse((string)item["schet2"]),
+                    Time = int.Parse((string)item["time"]),
+                    One = float.Parse((string)item["one"]),
+                    Two = float.Parse((string)item["two"]),
+                    X = float.Parse((string)item["x"]),
+                    X1 = float.Parse((string)item["x1"]),
+                    OneTwo = float.Parse((string)item["oneTwo"]),
+                    X2 = float.Parse((string)item["x2"]),
+                    Fora1 = float.Parse((string)item["fora1"]),
+                    Fora2 = float.Parse((string)item["fora2"]),
+                    Down = float.Parse((string)item["down"]),
+                    Up = float.Parse((string)item["up"]),
+                    Fora1skoba = float.Parse((string)item["fora1skoba"]),
+                    Fora2skoba = float.Parse((string)item["fora2skoba"]),
+                    Downskoba = float.Parse((string)item["downskoba"]),
+                    Upskoba = float.Parse((string)item["upskoba"])
+
+
+                };
+                TimeSpan timeSpan = footbalShow.dateParse - DateTime.Now;
+
+                if (timeSpan.TotalDays > 5) AdapterClass.dBadapter.DeleteData("football", $"id = {item["id"]}");
+                else  footbalShows.Add(footbalShow);
+            }
+            //AdapterClass.dBadapter.GetData
+
             EventsDataGrid.ItemsSource = footbalShows;
+            Thread.Sleep(1000);
             WindowForTables wft = new WindowForTables();
             wft.Show();
 
@@ -45,7 +95,8 @@ namespace ParserMarathonBet
             {
                 LoadButton.Content = "Остановить";
                 timerParser = new DispatcherTimer();
-                timerParser.Interval = TimeSpan.FromSeconds(3); // Set interval to 3 seconds
+                timerParser.Interval = TimeSpan.FromMinutes(3); // Set interval to 3 seconds
+               // timerParser.Interval = TimeSpan.FromSeconds(20); // Set interval to 3 seconds
                 timerParser.Tick += TimerParser_Tick;
                 timerParser.Start();
             }
@@ -168,7 +219,7 @@ namespace ParserMarathonBet
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Произошла ошибка: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                //MessageBox.Show($"Произошла ошибка: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -176,7 +227,7 @@ namespace ParserMarathonBet
         {
             foreach(var subject in subjects)
             {
-                if (subject.SubjectName == "Киберспорт") continue;
+               // if (subject.SubjectName == "Киберспорт") continue;
                 foreach (var group in subject.Groups)
                 {
                     foreach (var ev in group.Events)
@@ -278,9 +329,37 @@ namespace ParserMarathonBet
                                 Downskoba = downskoba,
                                 Upskoba = upskoba
                             };
-                            if(Zadacha1(footbalShow2) || Zadacha2(footbalShow2)|| Zadacha3(footbalShow2)
-                                || Zadacha4(footbalShow2)|| Zadacha5(footbalShow2)|| Zadacha6(footbalShow2))
-                            footbalShows.Add(footbalShow2);
+                            //if(Zadacha1(footbalShow2) || Zadacha2(footbalShow2)|| Zadacha3(footbalShow2)
+                            //    || Zadacha4(footbalShow2)|| Zadacha5(footbalShow2)|| Zadacha6(footbalShow2))
+                            //{
+                                footbalShows.Add(footbalShow2);
+                                var data = new Dictionary<string, object>
+                                {
+                                    { AdapterClass.footbalColumn[0], footbalShow2.EventName },
+                                    { AdapterClass.footbalColumn[1], footbalShow2.Team1 },
+                                    { AdapterClass.footbalColumn[2], footbalShow2.dateParse},
+                                    { AdapterClass.footbalColumn[3], footbalShow2.Team2 },
+                                    { AdapterClass.footbalColumn[4], footbalShow2.Schet1},
+                                    { AdapterClass.footbalColumn[5], footbalShow2.Schet2},
+                                    { AdapterClass.footbalColumn[6], footbalShow2.Time},
+                                    { AdapterClass.footbalColumn[7], footbalShow2.One},
+                                    { AdapterClass.footbalColumn[8], footbalShow2.Two},
+                                    { AdapterClass.footbalColumn[9], footbalShow2.X},
+                                    { AdapterClass.footbalColumn[10], footbalShow2.X1},
+                                    { AdapterClass.footbalColumn[11], footbalShow2.OneTwo},
+                                    { AdapterClass.footbalColumn[12], footbalShow2.X2},
+                                    { AdapterClass.footbalColumn[13], footbalShow2.Fora1},
+                                    { AdapterClass.footbalColumn[14], footbalShow2.Fora2},
+                                    { AdapterClass.footbalColumn[15], footbalShow2.Down},
+                                    { AdapterClass.footbalColumn[16], footbalShow2.Up},
+                                    { AdapterClass.footbalColumn[17], footbalShow2.Fora1skoba},
+                                    { AdapterClass.footbalColumn[18], footbalShow2.Fora2skoba},
+                                    { AdapterClass.footbalColumn[19], footbalShow2.Downskoba},
+                                    { AdapterClass.footbalColumn[20], footbalShow2.Upskoba}
+                                };
+                                AdapterClass.dBadapter.AddData("football", data);
+                            //}
+                            
                         }
                        
                     }

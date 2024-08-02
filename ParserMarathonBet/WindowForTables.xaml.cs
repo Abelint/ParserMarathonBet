@@ -231,11 +231,53 @@ namespace ParserMarathonBet
         public WindowForTables()
         {
             InitializeComponent();
+
+            var data = AdapterClass.dBadapter.GetData("tennis");
+            foreach (var item in data)
+            {
+                DateTime time = DateTime.Now;
+                DateTime.TryParse((string)item["dateParse"], out time);
+                  //private string eventName;
+        //private string time;
+        //private string dateParse;
+        //private string one;
+        //private string two;
+        //private string fora1;
+        //private string fora2;
+        //private string down;
+        //private string up;
+        //private bool isHighlighted;
+        ForDisplay tennisShow = new ForDisplay()
+                {
+                    EventName = (string)item["eventName"],
+                    DataParse = (string)item["dateParse"],
+                   
+                   
+                    Time = (string)item["time"],
+                    One =(string)item["one"],
+                    Two = (string)item["two"],                   
+                    Fora1 =(string)item["fora1"],
+                    Fora2 =(string)item["fora2"],
+                    Down =(string)item["down"],
+                    Up =(string)item["up"],
+                    IsHighlighted = bool.Parse((string)item["isHighlighted"])
+                   
+
+
+                };
+                TimeSpan timeSpan = time - DateTime.Now;
+
+                if (timeSpan.TotalDays > 5) AdapterClass.dBadapter.DeleteData("tennis", $"id = {item["id"]}");
+                else Display.Add(tennisShow);
+            }
+
+
+
             dataGrid.ItemsSource = Display;
             FStartAsync();
             timer = new DispatcherTimer
             {
-                Interval = TimeSpan.FromSeconds(20)
+                Interval = TimeSpan.FromMinutes(5)
             };
             timer.Tick += async (s, e) => await StartParseAsync();
             timer.Start();
@@ -555,6 +597,21 @@ namespace ParserMarathonBet
                 };
                 bool color = true;
                 Display.Add(forDisplay);
+                var data = new Dictionary<string, object>
+                                {
+                                    { AdapterClass.tennisColumn[0], forDisplay.EventName },
+                                    { AdapterClass.tennisColumn[1], forDisplay.Time },
+                                    { AdapterClass.tennisColumn[2], forDisplay.DataParse},
+                                    { AdapterClass.tennisColumn[3], forDisplay.One },
+                                    { AdapterClass.tennisColumn[4], forDisplay.Two},
+                                    { AdapterClass.tennisColumn[5], forDisplay.Fora1},
+                                    { AdapterClass.tennisColumn[6], forDisplay.Fora2},
+                                    { AdapterClass.tennisColumn[7], forDisplay.Down},
+                                    { AdapterClass.tennisColumn[8], forDisplay.Up},
+                                    { AdapterClass.tennisColumn[9], forDisplay.IsHighlighted}
+                                    
+                                };
+                AdapterClass.dBadapter.AddData("tennis", data);
                 if (r != null)
                 {
                     ForDisplay lastFD = null;
@@ -594,7 +651,24 @@ namespace ParserMarathonBet
                                 IsHighlighted = color
                             };
                             lastFD = for2;
+
                             Display.Add(for2);
+                            var data2 = new Dictionary<string, object>
+                                {
+                                    { AdapterClass.tennisColumn[0], for2.EventName },
+                                    { AdapterClass.tennisColumn[1], for2.Time },
+                                    { AdapterClass.tennisColumn[2], for2.DataParse},
+                                    { AdapterClass.tennisColumn[3], for2.One },
+                                    { AdapterClass.tennisColumn[4], for2.Two},
+                                    { AdapterClass.tennisColumn[5], for2.Fora1},
+                                    { AdapterClass.tennisColumn[6], for2.Fora2},
+                                    { AdapterClass.tennisColumn[7], for2.Down},
+                                    { AdapterClass.tennisColumn[8], for2.Up},
+                                    { AdapterClass.tennisColumn[9], for2.IsHighlighted}
+
+                                };
+                            AdapterClass.dBadapter.AddData("tennis", data2);
+
                         }
                     }
 

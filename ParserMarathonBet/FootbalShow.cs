@@ -38,6 +38,7 @@ namespace ParserMarathonBet
             }
         }
         private string eventName;
+        public DateTime dateParse = DateTime.Now;
         private string team1;
         private string team2;
         private int schet1 = -1;
@@ -58,11 +59,7 @@ namespace ParserMarathonBet
         private float fora2skoba = float.NaN;
         private float downskoba = float.NaN;
         private float upskoba = float.NaN;
-
-        private string fora1_All = "-";
-        private string fora2_All = "-";
-        private string down_All = "-";
-        private string up_All = "-";
+        
         public string Fora1_All
         {
             get => "(" + fora1skoba+")"+ "\n"+fora1;
